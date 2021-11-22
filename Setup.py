@@ -6,6 +6,8 @@ from pathlib import Path
 import collections
 from collections import OrderedDict
 
+from mysql.connector.errors import OperationalError
+
 # from Database import cursor
 from dotenv import load_dotenv, find_dotenv
 
@@ -122,37 +124,38 @@ def update_tables(dbVer):
 
 
 def execute_scripts(dbver):
-    path = Path("scripts")
+    try:
+        path = Path("scripts")
+        for p in path.iterdir():
+            result = p.name.endswith('.sql')
+            if result == True:
+                fileNameOnly = p.name.replace(' ', '.')
+                if fileNameOnly[0].isdigit() == True:
+                    fileNumber = fileNameOnly.split('.')
+                    for file in fileNumber:
+                        if fileNumber[0].startswith('0'):
+                            fileNumber[0] = fileNumber[0].replace('0', '.')
+                            fileNameDict[fileNumber[0]] = p.name
+                        else:
+                            fileNameDict[fileNumber[0]] = p.name
+                    sortedFileNoDict = dict(sorted(fileNameDict.items()))
 
-    for p in path.iterdir():
-        result = p.name.endswith('.sql')
-        if result == True:
-            fileNameOnly = p.name.replace(' ', '.')
-            if fileNameOnly[0].isdigit() == True:
-                fileNumber = fileNameOnly.split('.')
-                for file in fileNumber:
-                    if fileNumber[0].startswith('0'):
-                        fileNumber[0] = fileNumber[0].replace('0', '.')
-                        fileNameDict[fileNumber[0]] = p.name
-                    else:
-                        fileNameDict[fileNumber[0]] = p.name
-                sortedFileNoDict = dict(sorted(fileNameDict.items()))
-
-    lastkey = float(list(sortedFileNoDict.keys())[-1])
-    if float(dbver) == lastkey:
-        print("Nothing to execute because the version in db is latest", lastkey)
-    elif float(dbver) < lastkey:
-        for key, value in sortedFileNoDict.items():
-            if float(key) > float(dbver):
-                print("The the scripts are run", key, value)
-                update_tables(int(key))
-                run_scripts(value)
-
+        lastkey = float(list(sortedFileNoDict.keys())[-1])
+        if float(dbver) == lastkey:
+            print("Nothing to execute because the version in db is latest", lastkey)
+        elif float(dbver) < lastkey:
+            for key, value in sortedFileNoDict.items():
+                if float(key) > float(dbver):
+                    print("The the scripts are run", key, value)
+                    update_tables(int(key))
+                    run_scripts(value)
+    except OperationalError as err:
+        print("The path could not be found", err)
 # Function that executes if the db version is lesser than the SQL file versions
 
 
 def run_scripts(scriptname):
-    #my_cursor.execute("USE {}".format(DB_NAME))
+    # my_cursor.execute("USE {}".format(DB_NAME))
     sql = ("INSERT INTO testTable(script) VALUES(%s)")
     my_cursor.execute(sql, (scriptname,))
     mydb.commit()
