@@ -64,6 +64,19 @@ def create_tables():
                 print(err.msg)
 
 
+def insert_data(Id, version):
+    my_cursor.execute("USE {}".format(DB_NAME))
+    my_cursor.execute("SELECT COUNT(*) FROM versionTable")
+    rowcount = my_cursor.fetchone()
+    print("The row count is ", rowcount[0])
+    if rowcount[0] == 0:
+        sql = ("INSERT INTO version(Id, version) VALUES(%s, %s)")
+        my_cursor.execute(sql, (Id, version))
+        mydb.commit()
+    else:
+        print("Table values are already updated")
+
+
 def show_tables():
     my_cursor.execute("USE {}".format(DB_NAME))
     sql = ("SELECT version FROM versionTable")
@@ -71,35 +84,50 @@ def show_tables():
     result = my_cursor.fetchall()
     for dbVersion in result:
         return dbVersion[0]
-        #print("Existing db_version is ", dbVersion[0])
 
 
-def execute_Scripts(dbver):
+def update_tables(dbVer):
+    my_cursor.execute("USE {}".format(DB_NAME))
+    sql = ("UPDATE versionTable SET version = %s WHERE Id = %s")
+    my_cursor.execute(sql, (dbVer, 1))
+    mydb.commit()
+    print("The updated version is", dbVer)
+    show_tables()
+
+
+def execute_scripts(dbver):
     path = Path("scripts")
 
     for p in path.iterdir():
         result = p.name.endswith('.sql')
         if result == True:
             fileNameOnly = p.name.replace(' ', '.')
+            # fileNametoExcludeZero = fileNameOnly.replace('0', '')
+            # print("The files with versions are ", fileNameOnly)
             if fileNameOnly[0].isdigit() == True:
                 fileNumber = fileNameOnly.split('.')
-                fileNameDict[fileNumber[0]] = p.name
+                for file in fileNumber:
+                    if fileNumber[0].startswith('0'):
+                        fileNumber[0] = fileNumber[0].replace('0', '.')
+                        fileNameDict[fileNumber[0]] = p.name
+                    else:
+                        fileNameDict[fileNumber[0]] = p.name
                 sortedFileNoDict = dict(sorted(fileNameDict.items()))
     print(sortedFileNoDict)
 
     # lastkey = int((reversed(sortedFileNoDict.keys())))
-    lastkey = int(list(sortedFileNoDict.keys())[-1])
-    print(lastkey)
-    if int(dbver) == lastkey:
-        print("This scripts are using the latest db version which is", lastkey)
-        print("Reversed range of key", list(reversed(range(lastkey+1))))
-    elif int(dbver) < lastkey:
-        for k, v in sortedFileNoDict.items():
-            if sortedFileNoDict[k] > str(dbver):
-                print(sortedFileNoDict[k])
+    lastkey = float(list(sortedFileNoDict.keys())[-1])
+    if float(dbver) == lastkey:
+        print("Nothing to execute because the version in db is latest", lastkey)
+    elif float(dbver) < lastkey:
+        for key, value in sortedFileNoDict.items():
+            if float(key) > float(dbver):
+                print("The the scripts are run", key, value)
+                update_tables(int(key))
 
 
 create_database()
 create_tables()
+insert_data(1, 3)
 show_tables()
-execute_Scripts(dbver=show_tables())
+execute_scripts(dbver=show_tables())

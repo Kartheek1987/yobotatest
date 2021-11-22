@@ -1,5 +1,4 @@
 mysql-connector
-SQLAlchemy
 PyMySQL
 python-dotenv
 virtualenv
