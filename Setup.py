@@ -131,7 +131,7 @@ def execute_scripts(dbver):
         for key, value in sortedFileNoDict.items():
             if float(key) > float(dbver):
                 print("The the scripts are run", key, value)
-               # update_tables(int(key))
+                update_tables(int(key))
                 run_scripts(value)
 
 
