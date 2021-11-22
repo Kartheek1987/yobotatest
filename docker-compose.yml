@@ -20,7 +20,7 @@ services:
     command: python3 Setup.py
     depends_on:
       - mysql_db
-    #restart: always
+    restart: always
     env_file:
       - ./env/dev.env
     networks:

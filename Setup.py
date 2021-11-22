@@ -90,11 +90,21 @@ def insert_data(Id, version):
     rowcount = my_cursor.fetchone()
     print("The row count is ", rowcount[0])
     if rowcount[0] == 0:
-        sql = ("INSERT INTO version(Id, version) VALUES(%s, %s)")
+        sql = ("INSERT INTO versionTable(Id, version) VALUES(%s, %s)")
         my_cursor.execute(sql, (Id, version))
         mydb.commit()
     else:
         print("Table values are already updated")
+
+# Function that executes if the db version is lesser than the SQL file versions
+
+
+def run_scripts(scriptname):
+    # my_cursor.execute("USE {}".format(DB_NAME))
+    sql = ("INSERT INTO testTable(script) VALUES(%s)")
+    my_cursor.execute(sql, (scriptname,))
+    mydb.commit()
+    print("Added script {}".format(scriptname))
 
 # Function to give version number
 
@@ -151,21 +161,11 @@ def execute_scripts(dbver):
                     run_scripts(value)
     except OperationalError as err:
         print("The path could not be found", err)
-# Function that executes if the db version is lesser than the SQL file versions
-
-
-def run_scripts(scriptname):
-    # my_cursor.execute("USE {}".format(DB_NAME))
-    sql = ("INSERT INTO testTable(script) VALUES(%s)")
-    my_cursor.execute(sql, (scriptname,))
-    mydb.commit()
-    print("Added script {}".format(scriptname))
 
 
 # Calling All Functions for db, tables , creating tables, select and executing the logic
-
 create_database()
 create_tables()
-insert_data(1, 3)
+insert_data(Id=1, version=3)
 show_tables()
 execute_scripts(dbver=show_tables())
