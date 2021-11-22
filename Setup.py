@@ -42,6 +42,14 @@ TABLES['versionTable'] = (
     ") ENGINE=InnoDB"
 )
 
+TABLES['testTable'] = (
+    "CREATE TABLE `testTable` ("
+    " `Id` int(11) NOT NULL AUTO_INCREMENT,"
+    " `script` varchar(50) NOT NULL,"
+    " PRIMARY KEY (`Id`)"
+    ") ENGINE=InnoDB"
+)
+
 
 def create_database():
     my_cursor.execute(
@@ -123,7 +131,16 @@ def execute_scripts(dbver):
         for key, value in sortedFileNoDict.items():
             if float(key) > float(dbver):
                 print("The the scripts are run", key, value)
-                update_tables(int(key))
+               # update_tables(int(key))
+                run_scripts(value)
+
+
+def run_scripts(scriptname):
+    #my_cursor.execute("USE {}".format(DB_NAME))
+    sql = ("INSERT INTO testTable(script) VALUES(%s)")
+    my_cursor.execute(sql, (scriptname,))
+    mydb.commit()
+    print("Added script {}".format(scriptname))
 
 
 create_database()
