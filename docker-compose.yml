@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  mysql_db:
+    container_name: MySQL_db
+    image: mysql:5.7.13
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./env:/etc/mysql/conf.d
+    restart: always
+    ports:
+      - 3306:3306
+    env_file:
+      - ./env/dev.env
+    networks:
+      - app-tier
+  mypython:
+    container_name: Python_app
+    build: ./
+    command: python3 Setup.py
+    depends_on:
+      - mysql_db
+    #restart: always
+    env_file:
+      - ./env/dev.env
+    networks:
+      - app-tier
+
+volumes:
+  db_data: {}
+
+networks:
+  app-tier:
+    driver: bridge
+
+
