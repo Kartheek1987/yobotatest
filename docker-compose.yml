@@ -9,7 +9,7 @@ services:
       - ./env:/etc/mysql/conf.d
     restart: always
     ports:
-      - 3306:3306
+      - 3308:3308
     env_file:
       - ./env/dev.env
     networks:
