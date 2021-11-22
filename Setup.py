@@ -17,12 +17,13 @@ fileNames = []
 fileNameDict = {}
 global dbVersion
 
-# specify database configurations
+# specify database configurations from env variables
 db_user = os.getenv('MYSQL_USER')
 db_pwd = os.getenv('MYSQL_ROOT_PASSWORD')
 db_host = os.getenv('MYSQL_HOST_NAME')
 db_name = os.getenv('MYSQL_DATABASE')
 
+# mysql connector to setup connection to db, use env variables
 mydb = mysql.connector.connect(
     user=db_user,
     password=db_pwd,
@@ -30,10 +31,12 @@ mydb = mysql.connector.connect(
     database=db_name
 )
 
+# Initializations to cursor, db name annd tables
 my_cursor = mydb.cursor()
 DB_NAME = 'scripts'
 TABLES = {}
 
+# Table names can be added here
 TABLES['versionTable'] = (
     "CREATE TABLE `versionTable` ("
     " `Id` int(11) NOT NULL AUTO_INCREMENT,"
@@ -50,11 +53,16 @@ TABLES['testTable'] = (
     ") ENGINE=InnoDB"
 )
 
+# Function creates database only if it doesn't exists
+
 
 def create_database():
     my_cursor.execute(
         "CREATE DATABASE IF NOT EXISTS {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME))
     print("Created {} database".format(DB_NAME))
+
+
+# Function that creates tables versionTable and testTable
 
 
 def create_tables():
@@ -71,6 +79,8 @@ def create_tables():
             else:
                 print(err.msg)
 
+# Function that inserts data into versionTable
+
 
 def insert_data(Id, version):
     my_cursor.execute("USE {}".format(DB_NAME))
@@ -84,6 +94,8 @@ def insert_data(Id, version):
     else:
         print("Table values are already updated")
 
+# Function to give version number
+
 
 def show_tables():
     my_cursor.execute("USE {}".format(DB_NAME))
@@ -92,6 +104,8 @@ def show_tables():
     result = my_cursor.fetchall()
     for dbVersion in result:
         return dbVersion[0]
+
+# Function updates the versionTable with the latest version from Scripts Directory
 
 
 def update_tables(dbVer):
@@ -103,6 +117,10 @@ def update_tables(dbVer):
     show_tables()
 
 
+# Function with the business logic that takes the scripts names &
+#  provides them to subsequent functions
+
+
 def execute_scripts(dbver):
     path = Path("scripts")
 
@@ -110,8 +128,6 @@ def execute_scripts(dbver):
         result = p.name.endswith('.sql')
         if result == True:
             fileNameOnly = p.name.replace(' ', '.')
-            # fileNametoExcludeZero = fileNameOnly.replace('0', '')
-            # print("The files with versions are ", fileNameOnly)
             if fileNameOnly[0].isdigit() == True:
                 fileNumber = fileNameOnly.split('.')
                 for file in fileNumber:
@@ -121,9 +137,7 @@ def execute_scripts(dbver):
                     else:
                         fileNameDict[fileNumber[0]] = p.name
                 sortedFileNoDict = dict(sorted(fileNameDict.items()))
-    print(sortedFileNoDict)
 
-    # lastkey = int((reversed(sortedFileNoDict.keys())))
     lastkey = float(list(sortedFileNoDict.keys())[-1])
     if float(dbver) == lastkey:
         print("Nothing to execute because the version in db is latest", lastkey)
@@ -134,6 +148,8 @@ def execute_scripts(dbver):
                 update_tables(int(key))
                 run_scripts(value)
 
+# Function that executes if the db version is lesser than the SQL file versions
+
 
 def run_scripts(scriptname):
     #my_cursor.execute("USE {}".format(DB_NAME))
@@ -142,6 +158,8 @@ def run_scripts(scriptname):
     mydb.commit()
     print("Added script {}".format(scriptname))
 
+
+# Calling All Functions for db, tables , creating tables, select and executing the logic
 
 create_database()
 create_tables()
