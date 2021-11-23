@@ -5,10 +5,7 @@ import os
 from pathlib import Path
 import collections
 from collections import OrderedDict
-
 from mysql.connector.errors import OperationalError
-
-# from Database import cursor
 from dotenv import load_dotenv, find_dotenv
 
 # This loads the environment variables into this file
