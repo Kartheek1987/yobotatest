@@ -23,12 +23,15 @@ db_host = os.getenv('MYSQL_HOST_NAME')
 db_name = os.getenv('MYSQL_DATABASE')
 
 # mysql connector to setup connection to db, use env variables
-mydb = mysql.connector.connect(
-    user=db_user,
-    password=db_pwd,
-    host=db_host,
-    database=db_name
-)
+try:
+    mydb = mysql.connector.connect(
+        user=db_user,
+        password=db_pwd,
+        host=db_host,
+        database=db_name
+    )
+except mysql.connector.Error as err:
+    print("Cannot connect to db because: ", err.msg)
 
 # Initializations to cursor, db name annd tables
 my_cursor = mydb.cursor()
