@@ -1,5 +1,6 @@
 from typing import OrderedDict
 import mysql.connector
+from mysql.connector import cursor
 from mysql.connector import errorcode
 import os
 from pathlib import Path
@@ -23,15 +24,13 @@ db_host = os.getenv('MYSQL_HOST_NAME')
 db_name = os.getenv('MYSQL_DATABASE')
 
 # mysql connector to setup connection to db, use env variables
-try:
-    mydb = mysql.connector.connect(
-        user=db_user,
-        password=db_pwd,
-        host=db_host,
-        database=db_name
-    )
-except mysql.connector.Error as err:
-    print("Cannot connect to db because: ", err.msg)
+mydb = mysql.connector.connect(
+    user=db_user,
+    password=db_pwd,
+    host=db_host,
+    database=db_name
+)
+
 
 # Initializations to cursor, db name annd tables
 my_cursor = mydb.cursor()
