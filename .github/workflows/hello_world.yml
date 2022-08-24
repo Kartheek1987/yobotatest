@@ -23,6 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: goodbye World
-        run: echi "Goodbye world"
+        run: echo "Goodbye world"
         shell: bash
 
