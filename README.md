@@ -6,7 +6,11 @@
 2. Git clone repository `git clone git@github.com:Kartheek1987/yobotatest.git`
 3. Next cd into the repository and run `docker compose up --build`
 4. To log into the sql container do `docker exec --it MySQL_db bash` and the use
+   <<<<<<< HEAD
    `mysql --host=mysql_db -u = root -P 3306 -p` and enter and then give the username for the root password. After `use scripts;` db and `select * from versionTable;` and `select * from testTable;` to view the data
+   =======
+   `mysql --host=mysql_db -u root -P 3306 -p` and enter and then give the username for the root password. After `use scripts;` db and `select * from versionTable;` and `select * from testTable;` to view the data
+   > > > > > > > 11dbadcff65aacbcb38e8784d01164ef28ad1d33
 5. The docker compose will basically spin up mysql and python app containers required for the code to run
 6. Dockerfile includes all the necessary setup for install python once the docker compose is ran.
 7. Env folder has the environment variables for connecting to MYSQL that are used in Setup.py python code.
