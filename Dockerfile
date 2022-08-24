@@ -1,7 +1,7 @@
 FROM python:latest
 LABEL authors="KartheekThamma"
 
-# Created workdir and copy the files from local to the workinng directory
+# Created workdir and copy the files from local to the working directory
 EXPOSE 3306
 WORKDIR /usr/src/app
 COPY ./scripts/ /usr/src/app/scripts/
