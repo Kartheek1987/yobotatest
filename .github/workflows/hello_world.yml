@@ -9,18 +9,17 @@ on:
     - "main"
   workflow_dispatch:
 
-
 jobs:
   hello:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: hello Worldrun
+      - name: hello World        
         run: echo "Hello World"
         shell: bash
 
   goodbye:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: goodbye World
         run: echo "Goodbye world"
